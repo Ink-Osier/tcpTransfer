@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  tcp-transfer:
+    build: .
+    ports:
+      - "8080:8080"  # 默认端口映射
+    command: 
+      - "-listen"
+      - ":8080"
+      - "-upstream"
+      - "192.168.1.28:51111"  # 替换为你的上游服务器地址
+      - "-headers"
+      - "User-Agent:CustomAgent,X-Forwarded-For:1.2.3.4"  # 可选：自定义请求头修改
+      - "-keywords"
+      - "127.0.0.1:8080=>192.168.1.28:51111,http://127.0.0.1:8080=>https://192.168.1.28:51111" # 可选：全请求头关键提替换
+      - "-remove-headers"
+      - "X-Real-Ip" # 可选：需要移除的请求头
+    restart: unless-stopped
+    networks:
+      - proxy-net
+
+networks:
+  proxy-net:
+    driver: bridge
